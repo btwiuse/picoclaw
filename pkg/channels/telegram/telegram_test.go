@@ -1224,6 +1224,7 @@ func TestHandleMessage_ForumTopic_SetsMetadata(t *testing.T) {
 		Text:            "hello from topic",
 		MessageID:       10,
 		MessageThreadID: 42,
+		IsTopicMessage:  true,
 		Chat: telego.Chat{
 			ID:      -1001234567890,
 			Type:    "supergroup",
@@ -1318,6 +1319,45 @@ func TestHandleMessage_ReplyThread_NonForum_NoIsolation(t *testing.T) {
 
 	assert.Equal(t, "group", inbound.Context.ChatType)
 	assert.Empty(t, inbound.Context.TopicID)
+}
+
+func TestHandleMessage_PrivateChatTopic_SetsMetadata(t *testing.T) {
+	messageBus := bus.NewMessageBus()
+	ch := &TelegramChannel{
+		BaseChannel: channels.NewBaseChannel("telegram", nil, messageBus, nil),
+		chatIDs:     make(map[string]int64),
+		ctx:         context.Background(),
+	}
+
+	// Private chat with Telegram's thread/topic feature enabled.
+	// IsForum is not set (private chats don't have it), but IsTopicMessage is true
+	// and MessageThreadID identifies the topic.
+	msg := &telego.Message{
+		Text:            "gm",
+		MessageID:       1464,
+		MessageThreadID: 372951,
+		IsTopicMessage:  true,
+		Chat: telego.Chat{
+			ID:   220868736,
+			Type: "private",
+		},
+		From: &telego.User{
+			ID:        220868736,
+			FirstName: "Hangbiao",
+			Username:  "btwiuse",
+		},
+	}
+
+	err := ch.handleMessage(context.Background(), msg)
+	require.NoError(t, err)
+
+	inbound, ok := <-messageBus.InboundChan()
+	require.True(t, ok, "expected inbound message")
+
+	// ChatID includes the topic suffix so placeholder/typing/streaming keys are consistent.
+	assert.Equal(t, "220868736/372951", inbound.ChatID)
+	assert.Equal(t, "direct", inbound.Context.ChatType)
+	assert.Equal(t, "372951", inbound.Context.TopicID)
 }
 
 func assertHandleMessageQuotedUserReply(
