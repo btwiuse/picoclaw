@@ -818,8 +818,8 @@ func TestHandleMessage_ForumTopic_SetsMetadata(t *testing.T) {
 	inbound, ok := <-messageBus.InboundChan()
 	require.True(t, ok, "expected inbound message")
 
-	// ChatID remains the parent chat; TopicID isolates the sub-conversation.
-	assert.Equal(t, "-1001234567890", inbound.ChatID)
+	// ChatID includes the topic suffix so placeholder/typing/streaming keys are consistent.
+	assert.Equal(t, "-1001234567890/42", inbound.ChatID)
 	assert.Equal(t, "group", inbound.Context.ChatType)
 	assert.Equal(t, "42", inbound.Context.TopicID)
 }
@@ -929,8 +929,8 @@ func TestHandleMessage_PrivateChatTopic_SetsMetadata(t *testing.T) {
 	inbound, ok := <-messageBus.InboundChan()
 	require.True(t, ok, "expected inbound message")
 
-	// ChatID remains the parent chat; TopicID isolates the sub-conversation.
-	assert.Equal(t, "220868736", inbound.ChatID)
+	// ChatID includes the topic suffix so placeholder/typing/streaming keys are consistent.
+	assert.Equal(t, "220868736/372951", inbound.ChatID)
 	assert.Equal(t, "direct", inbound.Context.ChatType)
 	assert.Equal(t, "372951", inbound.Context.TopicID)
 }
