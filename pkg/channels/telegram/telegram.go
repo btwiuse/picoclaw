@@ -974,13 +974,15 @@ func (c *TelegramChannel) handleMessages(ctx context.Context, messages []*telego
 		content = c.prependTelegramQuotedReply(content, message.ReplyToMessage)
 	}
 
-	// For forum topics, embed the thread ID as "chatID/threadID" so replies
-	// route to the correct topic and each topic gets its own session.
-	// Only forum groups (IsForum) are handled; regular group reply threads
-	// must share one session per group.
+	// For forum topics (supergroup or private chat), embed the thread ID as
+	// "chatID/threadID" so replies route to the correct topic and each topic
+	// gets its own session. IsTopicMessage is set by the Telegram API for both
+	// supergroup forum topics and private chats with topics enabled; regular
+	// group reply threads have MessageThreadID set but IsTopicMessage=false,
+	// so they are intentionally excluded.
 	compositeChatID := fmt.Sprintf("%d", chatID)
 	threadID := message.MessageThreadID
-	if message.Chat.IsForum && threadID != 0 {
+	if message.IsTopicMessage && threadID != 0 {
 		compositeChatID = fmt.Sprintf("%d/%d", chatID, threadID)
 	}
 
@@ -1006,14 +1008,14 @@ func (c *TelegramChannel) handleMessages(ctx context.Context, messages []*telego
 
 	inboundCtx := bus.InboundContext{
 		Channel:   c.Name(),
-		ChatID:    fmt.Sprintf("%d", chatID),
+		ChatID:    compositeChatID,
 		ChatType:  peerKind,
 		SenderID:  platformID,
 		MessageID: messageID,
 		Mentioned: isMentioned,
 		Raw:       metadata,
 	}
-	if message.Chat.IsForum && threadID != 0 {
+	if message.IsTopicMessage && threadID != 0 {
 		inboundCtx.TopicID = fmt.Sprintf("%d", threadID)
 	}
 	if message.ReplyToMessage != nil {
