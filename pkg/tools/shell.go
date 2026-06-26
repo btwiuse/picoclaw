@@ -17,8 +17,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/creack/pty"
-
 	"github.com/sipeed/picoclaw/pkg/config"
 	"github.com/sipeed/picoclaw/pkg/constants"
 	"github.com/sipeed/picoclaw/pkg/isolation"
@@ -533,7 +531,7 @@ func (t *ExecTool) runBackground(ctx context.Context, command, cwd string, ptyEn
 	var stdinWriter io.WriteCloser
 
 	if ptyEnabled {
-		ptmx, tty, err := pty.Open()
+		ptmx, tty, err := ptyOpen()
 		if err != nil {
 			return ErrorResult(fmt.Sprintf("failed to create PTY: %v", err))
 		}

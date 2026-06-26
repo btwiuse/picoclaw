@@ -4,13 +4,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/ergochat/readline"
 
 	"github.com/sipeed/picoclaw/cmd/picoclaw/internal"
 	"github.com/sipeed/picoclaw/pkg/agent"
@@ -358,67 +355,16 @@ func createHeartbeatHandler(agentLoop *agent.AgentLoop) func(prompt, channel, ch
 
 func interactiveMode(agentLoop *agent.AgentLoop, sessionKey string) {
 	prompt := fmt.Sprintf("%s You: ", internal.Logo)
-
-	rl, err := readline.NewEx(&readline.Config{
-		Prompt:          prompt,
-		HistoryFile:     filepath.Join(os.TempDir(), ".picoclaw_history"),
-		HistoryLimit:    100,
-		InterruptPrompt: "^C",
-		EOFPrompt:       "exit",
-	})
-	if err != nil {
-		fmt.Printf("Error initializing readline: %v\n", err)
-		fmt.Println("Falling back to simple input mode...")
-		simpleInteractiveMode(agentLoop, sessionKey)
-		return
-	}
-	defer rl.Close()
+	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
-		line, err := rl.Readline()
-		if err != nil {
-			if err == readline.ErrInterrupt || err == io.EOF {
-				fmt.Println("\nGoodbye!")
-				return
-			}
-			fmt.Printf("Error reading input: %v\n", err)
-			continue
-		}
-
-		input := strings.TrimSpace(line)
-		if input == "" {
-			continue
-		}
-		if input == "exit" || input == "quit" {
-			fmt.Println("Goodbye!")
+		fmt.Print(prompt)
+		if !scanner.Scan() {
+			fmt.Println("\nGoodbye!")
 			return
 		}
 
-		ctx := context.Background()
-		response, err := agentLoop.ProcessDirect(ctx, input, sessionKey)
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			continue
-		}
-		fmt.Printf("\n%s %s\n\n", internal.Logo, response)
-	}
-}
-
-func simpleInteractiveMode(agentLoop *agent.AgentLoop, sessionKey string) {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		fmt.Print(fmt.Sprintf("%s You: ", internal.Logo))
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				fmt.Println("\nGoodbye!")
-				return
-			}
-			fmt.Printf("Error reading input: %v\n", err)
-			continue
-		}
-
-		input := strings.TrimSpace(line)
+		input := strings.TrimSpace(scanner.Text())
 		if input == "" {
 			continue
 		}
