@@ -23,7 +23,7 @@ import (
 	"maunium.net/go/mautrix/crypto/cryptohelper"
 	"maunium.net/go/mautrix/event"
 	"maunium.net/go/mautrix/id"
-	_ "modernc.org/sqlite"
+	_ "github.com/ncruces/go-sqlite3/driver"
 
 	"github.com/sipeed/picoclaw/pkg/bus"
 	"github.com/sipeed/picoclaw/pkg/channels"
@@ -34,7 +34,7 @@ import (
 )
 
 const (
-	sqliteDriver = "sqlite"
+	sqliteDriver = "sqlite3"
 	dbName       = "store.db"
 
 	typingRefreshInterval      = 20 * time.Second

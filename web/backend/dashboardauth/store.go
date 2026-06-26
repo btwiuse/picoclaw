@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 
 	"golang.org/x/crypto/bcrypt"
-	_ "modernc.org/sqlite" // register "sqlite" driver
+	_ "github.com/ncruces/go-sqlite3/driver" // register "sqlite3" driver
 )
 
 // Store holds a handle to the SQLite database that stores the bcrypt hash.

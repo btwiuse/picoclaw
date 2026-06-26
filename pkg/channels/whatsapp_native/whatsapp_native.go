@@ -26,7 +26,7 @@ import (
 	"go.mau.fi/whatsmeow/types/events"
 	waLog "go.mau.fi/whatsmeow/util/log"
 	"google.golang.org/protobuf/proto"
-	_ "modernc.org/sqlite"
+	_ "github.com/ncruces/go-sqlite3/driver"
 
 	"github.com/sipeed/picoclaw/pkg/bus"
 	"github.com/sipeed/picoclaw/pkg/channels"
@@ -37,7 +37,7 @@ import (
 )
 
 const (
-	sqliteDriver   = "sqlite"
+	sqliteDriver   = "sqlite3"
 	whatsappDBName = "store.db"
 
 	reconnectInitial    = 5 * time.Second

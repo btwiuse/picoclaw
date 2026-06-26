@@ -4,7 +4,7 @@ const (
 	// DBFilename is the SQLite database file stored under the PicoClaw home directory.
 	DBFilename = "launcher-auth.db"
 
-	sqliteDriver = "sqlite"
+	sqliteDriver = "sqlite3"
 	// bcryptCost is deliberately high enough to slow brute-force attempts.
 	bcryptCost = 12
 

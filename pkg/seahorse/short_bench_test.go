@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/ncruces/go-sqlite3/driver"
 )
 
 // newBenchStore creates a test store for benchmarks.
 func newBenchStore(b *testing.B) (*Store, func()) {
 	b.Helper()
-	db, err := sql.Open("sqlite", ":memory:")
+	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		b.Fatalf("open test db: %v", err)
 	}

@@ -2,7 +2,6 @@ package seahorse
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,8 +9,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	_ "modernc.org/sqlite"
 
 	"github.com/sipeed/picoclaw/pkg/logger"
 )
@@ -106,7 +103,7 @@ func NewEngine(config Config, completeFn CompleteFn) (*Engine, error) {
 		}
 	}
 
-	db, err := sql.Open("sqlite", config.DBPath)
+	db, err := openSQLite(config.DBPath)
 	if err != nil {
 		return nil, fmt.Errorf("open db: %w", err)
 	}
