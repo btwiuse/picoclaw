@@ -6,12 +6,10 @@ import (
 	"net/http"
 )
 
-// NewHTTPClient creates an *http.Client for js/wasm builds.
-// Custom transports and proxy settings are not supported in the browser environment.
-// Returns a new client each time so callers can safely modify Timeout without
-// affecting the global http.DefaultClient.
+// NewHTTPClient returns http.DefaultClient for js/wasm builds.
+// In js/wasm, only http.DefaultClient is wired to the browser fetch API.
+// Any other *http.Client will fall back to Go's DNS resolver which does not work.
+// Proxy settings are ignored — the browser handles networking.
 func NewHTTPClient(proxy string) *http.Client {
-	return &http.Client{
-		Timeout: DefaultRequestTimeout,
-	}
+	return http.DefaultClient
 }
