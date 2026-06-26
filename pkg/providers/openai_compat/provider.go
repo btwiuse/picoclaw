@@ -561,10 +561,7 @@ func (p *Provider) ChatStreamEvents(
 	}
 	p.applyCustomHeaders(req)
 
-	// Use a client without Timeout for streaming — the http.Client.Timeout covers
-	// the entire request lifecycle including body reads, which would kill long streams.
-	// Context cancellation still provides the safety net.
-	streamClient := &http.Client{Transport: p.httpClient.Transport}
+	streamClient := streamingClient(p.httpClient)
 	resp, err := streamClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)

@@ -158,8 +158,7 @@ func (p *GeminiProvider) ChatStreamEvents(
 	p.applyHeaders(req)
 	req.Header.Set("Accept", "text/event-stream")
 
-	// Streaming should not use a whole-request timeout; context cancellation is the guard.
-	streamClient := &http.Client{Transport: p.httpClient.Transport}
+	streamClient := streamingClient(p.httpClient)
 	resp, err := streamClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
