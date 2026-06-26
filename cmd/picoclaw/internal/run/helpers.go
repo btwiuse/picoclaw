@@ -65,7 +65,6 @@ var webhookChannelTypes = map[string]struct{}{
 	"dingtalk":       {},
 	"teams_webhook":  {},
 	"slack_webhook":  {},
-	"matrix":         {},
 }
 
 type runServices struct {

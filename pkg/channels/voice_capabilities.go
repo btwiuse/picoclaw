@@ -18,7 +18,6 @@ type VoiceCapabilityProvider interface {
 var asrCapableChannels = map[string]bool{
 	"discord":  true,
 	"telegram": true,
-	"matrix":   true,
 	"qq":       true,
 	"weixin":   true,
 	"line":     true,
